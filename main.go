@@ -7,29 +7,44 @@ import (
 	"github.com/lithiumagic/gator/internal/config"
 )
 
-// Update the main function to:
+type state struct {
+	config *config.Config
+}
 
-// Read the config file.
-// Set the current user to "lane" (actually, you should use your name instead) and update the config file on disk.
-// Read the config file again and print the contents of the config struct to the terminal.
+type command struct {
+	name      string
+	arguments []string
+}
 
 func main() {
 	cfg, err := config.Read()
 	if err != nil {
 		exitWithError(err)
 	}
-	err = cfg.SetUser("bob")
-	if err != nil {
+
+	currentState := &state{
+		config: &cfg,
+	}
+
+	commandsMap := commands{
+		handlers: make(map[string]func(*state, command) error),
+	}
+
+	commandsMap.register("login", handlerLogin)
+
+	if len(os.Args) < 2 {
+		err = fmt.Errorf("usage: gator <command> [args...]")
 		exitWithError(err)
 	}
 
-	cfg, err = config.Read()
+	comm := command{
+		name:      os.Args[1],
+		arguments: os.Args[2:],
+	}
+	err = commandsMap.run(currentState, comm)
 	if err != nil {
 		exitWithError(err)
 	}
-	fmt.Printf("DbUrl: %s\n", cfg.DbUrl)
-	fmt.Printf("CurrentUserName: %s\n", cfg.CurrentUserName)
-
 }
 
 func exitWithError(err error) {
