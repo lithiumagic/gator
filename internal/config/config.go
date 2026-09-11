@@ -8,11 +8,9 @@ import (
 
 const configFileName = ".gatorconfig.json"
 
-// But you can implement the internals of the package however you like.
-
 // Define a struct
 type Config struct {
-	DbUrl           string `json:"db_url"`
+	DBURL           string `json:"db_url"`
 	CurrentUserName string `json:"current_user_name"`
 }
 

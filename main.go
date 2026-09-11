@@ -1,14 +1,18 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"os"
 
+	_ "github.com/lib/pq"
 	"github.com/lithiumagic/gator/internal/config"
+	"github.com/lithiumagic/gator/internal/database"
 )
 
 type state struct {
-	config *config.Config
+	db  *database.Queries
+	cfg *config.Config
 }
 
 type command struct {
@@ -22,8 +26,16 @@ func main() {
 		exitWithError(err)
 	}
 
+	db, err := sql.Open("postgres", cfg.DBURL)
+	if err != nil {
+		exitWithError(err)
+	}
+	defer db.Close()
+	dbQueries := database.New(db)
+
 	currentState := &state{
-		config: &cfg,
+		cfg: &cfg,
+		db:  dbQueries,
 	}
 
 	commandsMap := commands{
@@ -31,6 +43,9 @@ func main() {
 	}
 
 	commandsMap.register("login", handlerLogin)
+	commandsMap.register("register", handlerRegisterUser)
+	commandsMap.register("reset", handlerReset)
+	commandsMap.register("users", handlerUsers)
 
 	if len(os.Args) < 2 {
 		err = fmt.Errorf("usage: gator <command> [args...]")
