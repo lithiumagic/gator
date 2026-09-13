@@ -93,3 +93,21 @@ func handlerReset(s *state, cmd command) error {
 	return nil
 
 }
+
+// handlerAgg
+
+func handlerAgg(s *state, cmd command) error {
+	if len(cmd.arguments) > 0 {
+		return errors.New("Too many arguments were given. Usage: agg")
+	}
+
+	feedRSS, err := fetchFeed(context.Background(), "https://www.wagslane.dev/index.xml")
+
+	if err != nil {
+		return fmt.Errorf("couldn't get the rss feed: %w", err)
+	}
+
+	fmt.Printf("%+v\n", feedRSS)
+	return nil
+
+}

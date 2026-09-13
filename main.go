@@ -46,6 +46,7 @@ func main() {
 	commandsMap.register("register", handlerRegisterUser)
 	commandsMap.register("reset", handlerReset)
 	commandsMap.register("users", handlerUsers)
+	commandsMap.register("agg", handlerAgg)
 
 	if len(os.Args) < 2 {
 		err = fmt.Errorf("usage: gator <command> [args...]")
